@@ -19,7 +19,6 @@ def a_star(start_node: int, end_node: int, adj_list: list(tuple), nodes: list) -
     shortest_distances = [float("inf") for _ in range(total_nodes)]
     shortest_distances[start_node] = 0
 
-    x_end, y_end = nodes[end_node]
     heuristic_distances = precompute_heuristics(end_node, nodes)
 
     queue = [(heuristic_distances[start_node], start_node)]
