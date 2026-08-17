@@ -3,7 +3,19 @@ import heapq
 
 
 def bidirectional_dijksrta(adj_list: list[list], adj_list_reversed: list[list], start: int, end: int) -> int:
-
+    """
+    Compute the shortest path distance between two nodes using bidirectional Dijkstra's algorithm.
+    
+    Args:
+        adj_list: Adjacency list representing the forward graph as list of (neighbor, weight) tuples.
+        adj_list_reversed: Adjacency list representing the reversed graph as list of (neighbor, weight) tuples.
+        start: Starting node (1-indexed).
+        end: Ending node (1-indexed).
+    
+    Returns:
+        The shortest distance from start to end, or -1 if no path exists.
+    """
+    
     if start == end:
         return 0
     start -= 1
