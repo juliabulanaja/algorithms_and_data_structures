@@ -3,6 +3,21 @@ import heapq
 
 
 def dijkstra(start_node: int, adj_list: list) -> list:
+    """Computes the shortest-path distances from a source node to all reachable nodes.
+
+    Executes Dijkstra's algorithm using a min-heap priority queue to compute non-negative
+    shortest path weights from a single source across the given graph.
+
+    Args:
+        start_node: The 0-based index of the starting node.
+        adj_list: Adjacency list representing the graph, where adj_list[u] is a list 
+            of (neighbor, cost) tuples for node u.
+
+    Returns:
+        list[float]: A list where the value at index i represents the shortest distance 
+        from start_node to node i. Unreachable nodes have a value of float('inf').
+    """
+
     total_nodes = len(adj_list)
     distances = [float('inf')] * total_nodes
     distances[start_node] = 0
@@ -22,6 +37,17 @@ def dijkstra(start_node: int, adj_list: list) -> list:
 
 
 def get_start_node(adj_list: list) -> int:
+    """Finds the index of the first node in the graph that has at least one outgoing edge.
+
+    Args:
+        adj_list: Adjacency list representing the graph, where adj_list[u] is a list 
+            of (neighbor, weight) tuples for node u.
+
+    Returns:
+        int | None: The 0-based index of the first non-isolated node with outgoing edges, 
+        or None if all nodes in the adjacency list have no outgoing edges.
+    """
+    
     for i, neighbors in enumerate(adj_list):
         if neighbors:
             return i
@@ -29,6 +55,28 @@ def get_start_node(adj_list: list) -> int:
 
 
 def preprocessing(adj_list: list, adj_list_reversed: list) -> dict:
+    """Precomputes shortest-path distances to and from greedily chosen landmark nodes.
+
+    Selects landmarks across the graph using a farthest-first strategy. For each
+    chosen landmark, Dijkstra's algorithm is run on both the forward and reversed
+    graphs to precalculate distances for use as heuristics in Landmark-based A* (ALT).
+
+    Args:
+        adj_list: Adjacency list representing the forward graph, where adj_list[u]
+            is a list of (neighbor, weight) tuples.
+        adj_list_reversed: Adjacency list representing the reversed graph, where
+            adj_list_reversed[u] is a list of (predecessor, weight) tuples.
+
+    Returns:
+        dict: A dictionary mapping each landmark node index (int) to a tuple of
+        two lists:
+            - dist_from_landmark (list[float]): Shortest distances from the landmark
+              to all nodes in the graph.
+            - dist_to_landmark (list[float]): Shortest distances from all nodes in
+              the graph to the landmark.
+        Returns an empty dictionary if no valid start landmark is found.
+    """
+
     total_nodes = len(adj_list)
     total_landmarks = total_nodes // 1000 or 1
     landmarks = []
@@ -62,6 +110,22 @@ def preprocessing(adj_list: list, adj_list_reversed: list) -> dict:
 
 
 def a_start_with_preprocessing(start_node: int, target_node: int, preprocessed_graph: dict):
+    """Computes the shortest path distance between two nodes using Landmark-based A* (ALT).
+
+    Uses precomputed landmark distances as a lower-bound heuristic (via the triangle 
+    inequality) to guide A* search towards the target node.
+
+    Args:
+        start_node: The 0-based index of the starting node.
+        target_node: The 0-based index of the destination node.
+        preprocessed_graph: Dictionary mapping landmark indices to a tuple of distance 
+            lists: `(dist_from_landmark, dist_to_landmark)`.
+
+    Returns:
+        float: The shortest path distance from start_node to target_node, or -1 
+        if target_node is unreachable.
+    """
+
     total_nodes = len(adj_list)
     processed = [False] * total_nodes
     shortest_distances = [float("inf")] * total_nodes
@@ -95,6 +159,21 @@ def a_start_with_preprocessing(start_node: int, target_node: int, preprocessed_g
 
 
 def determine_landmark(node: int, preprocessed_graph: dict) -> int:
+    """Selects the preprocessed landmark closest to the given node.
+
+    Iterates through all available landmarks in the preprocessed graph data 
+    and returns the one with the smallest precomputed distance from the node.
+
+    Args:
+        node: The 0-based index of the node to find a landmark for.
+        preprocessed_graph: Dictionary mapping landmark indices to a tuple of distance 
+            lists: `(dist_from_landmark, dist_to_landmark)`.
+
+    Returns:
+        int | None: The index of the landmark node closest to the input node, or 
+        None if no landmarks are available in preprocessed_graph.
+    """
+
     closest_landmark = None
     closest_distance = float("inf")
     for l, (graph, _) in preprocessed_graph.items():
@@ -104,7 +183,23 @@ def determine_landmark(node: int, preprocessed_graph: dict) -> int:
     return closest_landmark
 
         
-def heuristic_distance(start_node: int, target_node: int, landmark: int, preprocessed_graph: dict) -> int:
+def heuristic_distance(start_node: int, target_node: int, landmark: int, preprocessed_graph: dict) -> float:
+    """Estimates the shortest path distance between start_node and target_node using landmark heuristics.
+
+    Applies the triangle inequality theorem using precomputed landmark distances to calculate
+    an admissible lower-bound distance heuristic for A* search.
+
+    Args:
+        start_node: The 0-based index of the current node being evaluated.
+        target_node: The 0-based index of the destination node.
+        landmark: The 0-based index of the chosen landmark node.
+        preprocessed_graph: Dictionary mapping landmark indices to a tuple of distance 
+            lists: `(dist_from_landmark, dist_to_landmark)`.
+
+    Returns:
+        float: The estimated minimum distance between start_node and target_node, or -1 
+        if landmark is None.
+    """
 
     if landmark is not None:
         landmark_to_start = preprocessed_graph[landmark][0][start_node]
