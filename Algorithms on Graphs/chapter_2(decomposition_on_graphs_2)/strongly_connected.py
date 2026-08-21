@@ -1,3 +1,6 @@
+# Task. Compute the number of strongly connected components of a given directed graph with 𝑛 vertices and
+# 𝑚 edges.
+
 import sys
 sys.setrecursionlimit(5000)
 
