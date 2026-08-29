@@ -26,7 +26,7 @@ def tarjan(adj_list: list) -> int:
     return ssc_count
 
 
-def dfs(at: int, adj_list: list, ids: list, low: list, on_stack: list, stack: list, id_: int) -> None:
+def dfs(at: int, adj_list: list, ids: list, low: list, on_stack: list, stack: list, id_: int):
     """
     Depth-first search for Tarjan's algorithm to find strongly connected components.
     
@@ -53,6 +53,7 @@ def dfs(at: int, adj_list: list, ids: list, low: list, on_stack: list, stack: li
     if ids[at] == low[at]:
         while True:
             node = stack.pop()
+            on_stack[node] = False
             low[node] = ids[at]
             if node == at:
                 break
