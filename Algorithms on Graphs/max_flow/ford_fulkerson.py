@@ -49,7 +49,9 @@ def get_bottleneck(path: list[int], capacity: list[list[int]]):
     """
     min_capacity = float('inf')
     for i in range(len(path) - 1):
-        current_capacity = capacity[i][i + 1]
+        u = path[i]
+        v = path[i + 1]
+        current_capacity = capacity[u][v]
         if current_capacity < min_capacity:
             min_capacity = current_capacity
     return min_capacity
@@ -81,6 +83,7 @@ def ford_fulkerson(s: int, t: int, capacity: list[list[int]]) -> int:
     while True:
 
         path = bfs(s, t, capacity)
+
         if not path:
             break
 
@@ -103,4 +106,3 @@ if __name__ == "__main__":
 
     result = ford_fulkerson(s - 1, t - 1, capacity)
     print(result)
-    
