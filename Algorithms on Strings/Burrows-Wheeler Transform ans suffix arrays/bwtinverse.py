@@ -12,13 +12,18 @@ def reconstruct(last_string: str) -> str:
     for i, char in enumerate(first_string):
         count = first_counts.get(char, 0)
         first_counts[char] = count + 1
-        first_positions[(char, count)] = i
+        first_positions[(char, count + 1)] = i
+
+    # print(first_counts)
+    # print(first_positions)
         
     shortcuts = [0] * n
     for i, char in enumerate(last_string):
         count = last_counts.get(char, 0)
         last_counts[char] = count + 1
-        shortcuts[i] = first_positions[(char, count)]
+        shortcuts[i] = first_positions[(char, count + 1)]
+
+    # print(shortcuts)
 
     reconstructed = [first_string[0]]
     next_index = 0
